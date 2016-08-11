@@ -1,150 +1,23 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Management;
 using System.Text.RegularExpressions;
 
 namespace Com0Com.CSharp
 {
-	public enum CommsMode
+	public class CrossoverPortPair
 	{
-		TCPClient,
-		UDP,
-		RFC2217,
-	}
-
-	public enum CommsStatus
-	{
-		Running,
-		Idle,
-	}
-
-	public class Com0comPortPair : INotifyPropertyChanged
-	{
-		#region Fields
-		private string _portConfigStringA = "";
-		private string _portConfigStringB = "";
-		private Process _p;
-		private CommsStatus _commsStatus = CommsStatus.Idle;
-		private CommsMode _commsMode = CommsMode.RFC2217;
-		private string _outputData = "";
-		private string _remoteIP = "";
-		private string _remotePort = "";
-		private string _localPort = "";
-
-		#endregion
-
-		#region Properties
-
-		public int PairNumber { get; private set; }
-		public string PortNameA { get; private set; }
-		public string PortNameB { get; private set; }
-
-		public string RemotePort
+		public CrossoverPortPair(string portNameA, string portNameB, int number)
 		{
-			get
-			{
-				return _remotePort;
-			}
-			set
-			{
-				_remotePort = value;
-				OnPropertyChanged("RemotePort");
-			}
-		}
-
-		public string RemoteIP
-		{
-			get
-			{
-				return _remoteIP;
-			}
-			set
-			{
-				_remoteIP = value;
-				OnPropertyChanged("RemoteIP");
-			}
-		}
-
-		public string LocalPort
-		{
-			get
-			{
-				return _localPort;
-			}
-			set
-			{
-				_localPort = value;
-				OnPropertyChanged("LocalPort");
-			}
-		}
-		public string OutputData
-		{
-			get { return _outputData; }
-			private set
-			{
-				_outputData = value;
-				OnPropertyChanged("OutputData");
-			}
-		}
-		public CommsMode CommsMode
-		{
-			get { return _commsMode; }
-			set
-			{
-				_commsMode = value;
-				OnPropertyChanged("CommsMode");
-			}
-		}
-		public CommsStatus CommsStatus
-		{
-			get { return _commsStatus; }
-			set
-			{
-				_commsStatus = value;
-				OnPropertyChanged("CommsStatus");
-			}
-		}
-
-		public string PortConfigStringA
-		{
-			get { return _portConfigStringA; }
-			set
-			{
-				Regex regex = new Regex(@"(?<=PortName=)\w+(?=,)");
-				_portConfigStringA = value;
-				PortNameA = regex.Match(value).Value;
-
-				OnPropertyChanged("PortNameA");
-				OnPropertyChanged("PortConfigStringA");
-
-			}
-		}
-		public string PortConfigStringB
-		{
-			get { return _portConfigStringB; }
-			set
-			{
-				Regex regex = new Regex(@"(?<=PortName=)\w+(?=,)");
-				_portConfigStringB = value;
-				PortNameB = regex.Match(value).Value;
-
-				OnPropertyChanged("PortNameB");
-				OnPropertyChanged("PortConfigStringB");
-
-			}
-		}
-
-		#endregion
-
-		public Com0comPortPair(int number)
-		{
-			RemoteIP = "192.168.7.1";
-			RemotePort = "8882";
-			LocalPort = "8883";
+			PortNameA = portNameA;
+			PortNameB = portNameB;
 			PairNumber = number;
 		}
 
-		#region Static Functions
+		public string PortNameA { get; }
+		public string PortNameB { get; }
+		public int PairNumber { get; }
 
 		/// <summary>
 		/// Kill a process, and all of its children, grandchildren, etc.
@@ -169,8 +42,6 @@ namespace Com0Com.CSharp
 				//we might get exceptions here, as parent might auto exit once their children are terminated
 			}
 		}
-
-		#endregion
 
 		public void StartComms()
 		{

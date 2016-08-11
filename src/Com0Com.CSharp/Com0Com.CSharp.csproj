@@ -30,13 +30,15 @@
     <Reference Include="System" />
     <Reference Include="System.Management" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Net" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="UacHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Com0comPortPair.cs" />
-    <Compile Include="Com0ComSetup.cs" />
-    <Compile Include="PortConfig.cs" />
+    <Compile Include="CrossoverPortPair.cs" />
+    <Compile Include="Com0ComSetupCFacade.cs" />
+    <Compile Include="Com2TcpConfig.cs" />
+    <Compile Include="Com2TcpFacade.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -10,17 +11,15 @@ namespace Com0Com.CSharp
 {
 	public static class Com0comSetup
 	{
-		private static string _com0comSetupc = @"C:\Program Files (x86)\com0com\setupc.exe";
-		private static string _com0comSetupg = @"C:\Program Files (x86)\com0com\setupg.exe";
+		private readonly static string _com0comSetupc = @"C:\Program Files (x86)\com0com\setupc.exe";
 
 		/// <summary>
 		/// Get all com0com Port Pairs currently installed in the system.
 		/// </summary>
 		/// <returns></returns>
-		public static ObservableCollection<Com0comPortPair> GetPortPairs()
+		public static IEnumerable<CrossoverPortPair> GetCrossoverPortPairs()
 		{
-
-			ObservableCollection<Com0comPortPair> ports = new ObservableCollection<Com0comPortPair>();
+			var ports = new List<CrossoverPortPair>();
 			//get the output from setupc --detail-prms list
 			var proc = new Process
 			{
@@ -44,11 +43,11 @@ namespace Com0Com.CSharp
 					Regex regex = new Regex(@"(?<=CNC[A,B])\d+(?=\s)");
 					int portnum = int.Parse(regex.Match(line).Value);
 
-					Com0comPortPair pair = ports.FirstOrDefault(d => d.PairNumber == portnum);
+					CrossoverPortPair pair = ports.FirstOrDefault(d => d.PairNumber == portnum);
 
 					if (pair == null)
 					{
-						pair = new Com0comPortPair(portnum);
+						pair = new CrossoverPortPair(portnum);
 						ports.Add(pair);
 					}
 					regex = new Regex(@"(?<=CNC)[A,B](?=\d+\s)");
@@ -70,13 +69,11 @@ namespace Com0Com.CSharp
 			return ports;
 		}
 
-		public static bool CreatePortPair(string portNameA)
+		public static void CreatePortPair()
 		{
-			if (UacHelper.IsUacEnabled)
-				if (!UacHelper.IsProcessElevated)
-					return false;
-			if (!UacHelper.IsAdministrator())
-				return false;
+			if (UacHelper.IsUacEnabled && !UacHelper.IsProcessElevated
+			    || !UacHelper.IsAdministrator())
+				throw new ApplicationException("This process must be run as an administrator.");
 
 			var proc = new Process
 			{
@@ -84,7 +81,7 @@ namespace Com0Com.CSharp
 				{
 					WorkingDirectory = Path.GetDirectoryName(_com0comSetupc),
 					FileName = _com0comSetupc,
-					Arguments = portNameA == "-" ? "install - -" : "install PortName=" + portNameA + " -",
+					Arguments = "install - -",
 					UseShellExecute = true,
 					CreateNoWindow = false,
 					Verb = "runas"
@@ -94,32 +91,16 @@ namespace Com0Com.CSharp
 
 			//TODO: add a timeout here
 			while (!proc.HasExited) { }
-			return proc.ExitCode == 0;
+
+			if (proc.ExitCode != 0)
+				throw new ApplicationException($"Could not add port pair.");
 		}
 
-		public static void LaunchSetupg()
+		public static void DeletePortPair(int n)
 		{
-			var proc = new Process
-			{
-				StartInfo = new ProcessStartInfo
-				{
-					WorkingDirectory = Path.GetDirectoryName(_com0comSetupc),
-					FileName = _com0comSetupg,
-					UseShellExecute = true,
-					CreateNoWindow = false,
-					Verb = "runas"
-				}
-			};
-			proc.Start();
-		}
-
-		public static bool DeletePortPair(int n)
-		{
-			if (UacHelper.IsUacEnabled)
-				if (!UacHelper.IsProcessElevated)
-					return false;
-			if (!UacHelper.IsAdministrator())
-				return false;
+			if (UacHelper.IsUacEnabled && !UacHelper.IsProcessElevated
+				|| !UacHelper.IsAdministrator())
+				throw new ApplicationException("This process must be run as an administrator.");
 
 			var proc = new Process
 			{
@@ -127,16 +108,19 @@ namespace Com0Com.CSharp
 				{
 					WorkingDirectory = Path.GetDirectoryName(_com0comSetupc),
 					FileName = _com0comSetupc,
-					Arguments = "remove " + n.ToString(),
+					Arguments = $"remove {n}",
 					UseShellExecute = true,
 					CreateNoWindow = false,
 					Verb = "runas"
 				}
 			};
 			proc.Start();
+
 			//TODO: add a timeout here
 			while (!proc.HasExited) { }
-			return proc.ExitCode == 0;
+
+			if (proc.ExitCode != 0)
+				throw new ApplicationException($"Could not delete port pair number {n}");
 		}
 	}
 }
