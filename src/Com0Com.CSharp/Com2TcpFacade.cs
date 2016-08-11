@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using Com0Com.CSharp.Configs;
 
 namespace Com0Com.CSharp
 {
@@ -8,7 +9,7 @@ namespace Com0Com.CSharp
 	{
 		private readonly string _com2TcpPath;
 
-		public Com2TcpFacade(string com2TcpPath)
+		public Com2TcpFacade(string com2TcpPath = @"C:\Program Files (x86)\com0com\com2tcp.exe")
 		{
 			_com2TcpPath = com2TcpPath;
 		}

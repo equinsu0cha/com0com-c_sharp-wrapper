@@ -7,21 +7,26 @@ using System.Text.RegularExpressions;
 
 namespace Com0Com.CSharp
 {
-	public static class Com0ComSetupCFacade
+	public class Com0ComSetupCFacade
 	{
-		private readonly static string _com0comSetupc = @"C:\Program Files (x86)\com0com\setupc.exe";
+		private readonly string _com0comSetupC;
+
+		public Com0ComSetupCFacade(string com0comSetupC = @"C:\Program Files (x86)\com0com\setupc.exe")
+		{
+			_com0comSetupC = com0comSetupC;
+		}
 
 		/// <summary>
 		/// Get all com0com Port Pairs currently installed in the system.
 		/// </summary>
 		/// <returns></returns>
-		public static IEnumerable<CrossoverPortPair> GetCrossoverPortPairs()
+		public IEnumerable<CrossoverPortPair> GetCrossoverPortPairs()
 		{
 			var proc = new Process
 			{
 				StartInfo = new ProcessStartInfo
 				{
-					FileName = _com0comSetupc,
+					FileName = _com0comSetupC,
 					Arguments = "list",
 					UseShellExecute = false,
 					RedirectStandardOutput = true,
@@ -40,7 +45,7 @@ namespace Com0Com.CSharp
 			return ParsePortPairsFromStdOut(lines);
 		}
 
-		public static CrossoverPortPair CreatePortPair(string comPortNameA, string comPortNameB)
+		public CrossoverPortPair CreatePortPair(string comPortNameA, string comPortNameB)
 		{
 			if (UacHelper.IsUacEnabled && !UacHelper.IsProcessElevated
 			    || !UacHelper.IsAdministrator())
@@ -50,8 +55,8 @@ namespace Com0Com.CSharp
 			{
 				StartInfo = new ProcessStartInfo
 				{
-					WorkingDirectory = Path.GetDirectoryName(_com0comSetupc),
-					FileName = _com0comSetupc,
+					WorkingDirectory = Path.GetDirectoryName(_com0comSetupC),
+					FileName = _com0comSetupC,
 					Arguments = $"install portname={comPortNameA} portname={comPortNameB}",
 					UseShellExecute = true,
 					CreateNoWindow = false,
@@ -69,7 +74,7 @@ namespace Com0Com.CSharp
 			return ParsePortPairsFromStdOut(lines).First();
 		}
 
-		public static void DeletePortPair(int n)
+		public void DeletePortPair(int n)
 		{
 			if (UacHelper.IsUacEnabled && !UacHelper.IsProcessElevated
 				|| !UacHelper.IsAdministrator())
@@ -79,8 +84,8 @@ namespace Com0Com.CSharp
 			{
 				StartInfo = new ProcessStartInfo
 				{
-					WorkingDirectory = Path.GetDirectoryName(_com0comSetupc),
-					FileName = _com0comSetupc,
+					WorkingDirectory = Path.GetDirectoryName(_com0comSetupC),
+					FileName = _com0comSetupC,
 					Arguments = $"remove {n}",
 					UseShellExecute = true,
 					CreateNoWindow = false,
@@ -95,7 +100,7 @@ namespace Com0Com.CSharp
 				throw new ApplicationException($"Could not delete port pair number {n}");
 		}
 
-		private static IEnumerable<CrossoverPortPair> ParsePortPairsFromStdOut(IEnumerable<string> lines)
+		private IEnumerable<CrossoverPortPair> ParsePortPairsFromStdOut(IEnumerable<string> lines)
 		{
 			var portAMap = new Dictionary<int, string>();
 			var portBMap = new Dictionary<int, string>();
