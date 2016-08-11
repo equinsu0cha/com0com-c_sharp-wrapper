@@ -1,1 +1,17 @@
-﻿<Properties />
+﻿<Properties>
+  <MonoDevelop.Ide.Workbench ActiveDocument="src/Com0Com.CSharp/Com2TcpFacade.cs">
+    <Files>
+      <File FileName="src/Com0Com.CSharp/UacHelper.cs" Line="90" Column="7" />
+      <File FileName="src/Com0Com.CSharp/Com0ComSetupCFacade.cs" Line="80" Column="37" />
+      <File FileName="src/MainPower.Com0com.Redirector/PortConfig.cs" Line="9" Column="23" />
+      <File FileName="src/Com0Com.CSharp/Com2TcpConfig.cs" Line="5" Column="24" />
+      <File FileName="src/Com0Com.CSharp/Com2TcpFacade.cs" Line="44" Column="39" />
+      <File FileName="src/Com0Com.CSharp/CrossoverPortPair.cs" Line="21" Column="3" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

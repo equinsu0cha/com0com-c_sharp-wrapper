@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -38,28 +36,26 @@ namespace Com0Com.CSharp
 			{
 				try
 				{
+					var portNameA = "";
+					var portNameB = "";
+						
 					string line = proc.StandardOutput.ReadLine();
 					//get port number
 					Regex regex = new Regex(@"(?<=CNC[A,B])\d+(?=\s)");
 					int portnum = int.Parse(regex.Match(line).Value);
 
-					CrossoverPortPair pair = ports.FirstOrDefault(d => d.PairNumber == portnum);
-
-					if (pair == null)
-					{
-						pair = new CrossoverPortPair(portnum);
-						ports.Add(pair);
-					}
 					regex = new Regex(@"(?<=CNC)[A,B](?=\d+\s)");
 					string portAB = regex.Match(line).Value;
 					if (portAB == "A")
 					{
-						pair.PortConfigStringA = line;
+						portNameA = line;
 					}
 					else if (portAB == "B")
 					{
-						pair.PortConfigStringB = line;
+						portNameB = line;
 					}
+
+					ports.Add(new CrossoverPortPair(portNameA, portNameB, portnum));
 				}
 				catch (Exception ex)
 				{

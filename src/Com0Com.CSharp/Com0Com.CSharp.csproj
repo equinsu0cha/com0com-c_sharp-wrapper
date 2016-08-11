@@ -37,8 +37,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CrossoverPortPair.cs" />
     <Compile Include="Com0ComSetupCFacade.cs" />
-    <Compile Include="Com2TcpConfig.cs" />
     <Compile Include="Com2TcpFacade.cs" />
+    <Compile Include="Configs\Com2TcpConfig.cs" />
+    <Compile Include="Configs\Com0ComConfig.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Configs\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
