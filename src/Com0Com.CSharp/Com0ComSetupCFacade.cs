@@ -45,7 +45,36 @@ namespace Com0Com.CSharp
 			return ParsePortPairsFromStdOut(lines);
 		}
 
-		public CrossoverPortPair CreatePortPair(string comPortNameA, string comPortNameB)
+	    public CrossoverPortPair CreatePortPair()
+	    {
+            if (UacHelper.IsUacEnabled && !UacHelper.IsProcessElevated
+                || !UacHelper.IsAdministrator())
+                throw new ApplicationException("This process must be run as an administrator.");
+
+            var proc = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    WorkingDirectory = Path.GetDirectoryName(_com0comSetupC),
+                    FileName = _com0comSetupC,
+                    Arguments = $"install - -",
+                    UseShellExecute = true,
+                    CreateNoWindow = false,
+                    Verb = "runas"
+                }
+            };
+            proc.Start();
+
+            var lines = new List<string>();
+            while (!proc.StandardOutput.EndOfStream)
+            {
+                lines.Add(proc.StandardOutput.ReadLine());
+            }
+
+            return ParsePortPairsFromStdOut(lines).First();
+        }
+
+	    public CrossoverPortPair CreatePortPair(string comPortNameA, string comPortNameB)
 		{
 			if (UacHelper.IsUacEnabled && !UacHelper.IsProcessElevated
 			    || !UacHelper.IsAdministrator())
