@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Com0Com.CSharp.Examples
+﻿namespace Com0Com.CSharp.Examples
 {
     class Program
     {
