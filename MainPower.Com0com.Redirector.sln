@@ -1,13 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainPower.Com0com.Redirector", "src\MainPower.Com0com.Redirector\MainPower.Com0com.Redirector.csproj", "{22FED73D-39DA-4298-94DE-840272B39BB3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{EEA2DF9C-CBDF-448A-A898-655FD54C89C0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Com0Com.CSharp", "src\Com0Com.CSharp\Com0Com.CSharp.csproj", "{D5480624-3BAA-4338-9BB4-ADBDF5285AED}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{8ACA266C-2E56-4B65-AE34-DC709DC3BE2D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Com0Com.CSharp.Examples", "examples\Com0Com.CSharp.Examples\Com0Com.CSharp.Examples.csproj", "{C3329BAE-4FBD-4F26-852C-E8C10BF5B2CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +27,10 @@ Global
 		{D5480624-3BAA-4338-9BB4-ADBDF5285AED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5480624-3BAA-4338-9BB4-ADBDF5285AED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D5480624-3BAA-4338-9BB4-ADBDF5285AED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3329BAE-4FBD-4F26-852C-E8C10BF5B2CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3329BAE-4FBD-4F26-852C-E8C10BF5B2CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3329BAE-4FBD-4F26-852C-E8C10BF5B2CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3329BAE-4FBD-4F26-852C-E8C10BF5B2CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -30,5 +38,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{22FED73D-39DA-4298-94DE-840272B39BB3} = {EEA2DF9C-CBDF-448A-A898-655FD54C89C0}
 		{D5480624-3BAA-4338-9BB4-ADBDF5285AED} = {EEA2DF9C-CBDF-448A-A898-655FD54C89C0}
+		{C3329BAE-4FBD-4F26-852C-E8C10BF5B2CA} = {8ACA266C-2E56-4B65-AE34-DC709DC3BE2D}
 	EndGlobalSection
 EndGlobal
