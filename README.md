@@ -7,9 +7,8 @@ At this time, the following features are implemented:
 * Remove a null-modem com port pair
 * Get all null-modem com port pairs
 
-There are plans in the future to wrap com2tcp, but who knows what that will happen :)
-
 This assembly is available on nuget.
+https://www.nuget.org/packages/Com0Com.CSharp/
 
 ###Usage
 To use this assembly, you must install com0com which can be found here:
