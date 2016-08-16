@@ -26,7 +26,8 @@ namespace Com0Com.CSharp
 			{
 				StartInfo = new ProcessStartInfo
 				{
-					FileName = _com0comSetupC,
+                    WorkingDirectory = Path.GetDirectoryName(_com0comSetupC),
+                    FileName = _com0comSetupC,
 					Arguments = "list",
 					UseShellExecute = false,
 					RedirectStandardOutput = true,
@@ -42,7 +43,7 @@ namespace Com0Com.CSharp
 				lines.Add(proc.StandardOutput.ReadLine());
 			}
 
-			return ParsePortPairsFromStdOut(lines);
+			return ParsePortPairsFromStdOut(lines.Select(l => l.Trim()));
 		}
 
 	    public CrossoverPortPair CreatePortPair()
@@ -58,8 +59,9 @@ namespace Com0Com.CSharp
                     WorkingDirectory = Path.GetDirectoryName(_com0comSetupC),
                     FileName = _com0comSetupC,
                     Arguments = $"install - -",
-                    UseShellExecute = true,
-                    CreateNoWindow = false,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true,
                     Verb = "runas"
                 }
             };
@@ -71,7 +73,7 @@ namespace Com0Com.CSharp
                 lines.Add(proc.StandardOutput.ReadLine());
             }
 
-            return ParsePortPairsFromStdOut(lines).First();
+            return ParsePortPairsFromStdOut(lines.Select(l => l.Trim())).First();
         }
 
 	    public CrossoverPortPair CreatePortPair(string comPortNameA, string comPortNameB)
@@ -87,9 +89,10 @@ namespace Com0Com.CSharp
 					WorkingDirectory = Path.GetDirectoryName(_com0comSetupC),
 					FileName = _com0comSetupC,
 					Arguments = $"install portname={comPortNameA} portname={comPortNameB}",
-					UseShellExecute = true,
-					CreateNoWindow = false,
-					Verb = "runas"
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true,
+                    Verb = "runas"
 				}
 			};
 			proc.Start();
@@ -100,7 +103,7 @@ namespace Com0Com.CSharp
 				lines.Add(proc.StandardOutput.ReadLine());
 			}
 
-			return ParsePortPairsFromStdOut(lines).First();
+			return ParsePortPairsFromStdOut(lines.Select(l => l.Trim())).First();
 		}
 
 		public void DeletePortPair(int n)
@@ -116,9 +119,10 @@ namespace Com0Com.CSharp
 					WorkingDirectory = Path.GetDirectoryName(_com0comSetupC),
 					FileName = _com0comSetupC,
 					Arguments = $"remove {n}",
-					UseShellExecute = true,
-					CreateNoWindow = false,
-					Verb = "runas"
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true,
+                    Verb = "runas"
 				}
 			};
 			proc.Start();
@@ -133,16 +137,16 @@ namespace Com0Com.CSharp
 		{
 			var portAMap = new Dictionary<int, string>();
 			var portBMap = new Dictionary<int, string>();
+            var lineRegex = new Regex(@"^CNC([AB])(\d+)\sPortName=(-|\w+)");
 
-			foreach (var line in lines)
+            foreach (var line in lines)
 			{
-				var lineRegex = new Regex(@"^CNC([A,B])(\d+)\sPortName=(\w+)");
 				var match = lineRegex.Match(line);
-				if (match == null) continue;
+				if (!match.Success) continue;
 
-				var portNum = Convert.ToInt32(match.Groups[1].Value);
-				var aOrB = match.Groups[0].Value;
-				var portName = match.Groups[2].Value;
+				var aOrB = match.Groups[1].Value;
+				var portNum = Convert.ToInt32(match.Groups[2].Value);
+				var portName = match.Groups[3].Value;
 
 				if (aOrB == "A")
 				{
@@ -155,10 +159,10 @@ namespace Com0Com.CSharp
 			}
 
 			var ret = new List<CrossoverPortPair>();
-			for (var i = 0; i < portAMap.Keys.Count; i++)
-			{
-				ret.Add(new CrossoverPortPair(portBMap[i], portBMap[i], i));
-			}
+		    foreach (var key in portAMap.Keys)
+		    {
+                ret.Add(new CrossoverPortPair(portAMap[key],portBMap[key], key));
+            }
 
 			return ret;
 		}
