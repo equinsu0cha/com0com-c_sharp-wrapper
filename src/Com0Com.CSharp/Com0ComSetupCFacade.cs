@@ -22,7 +22,11 @@ namespace Com0Com.CSharp
 		/// <returns></returns>
 		public IEnumerable<CrossoverPortPair> GetCrossoverPortPairs()
 		{
-			var proc = new Process
+            if ((UacHelper.IsUacEnabled && !UacHelper.IsProcessElevated)
+                || !UacHelper.IsAdministrator())
+                throw new ApplicationException("This process must be run as an administrator.");
+
+            var proc = new Process
 			{
 				StartInfo = new ProcessStartInfo
 				{
@@ -48,7 +52,7 @@ namespace Com0Com.CSharp
 
 	    public CrossoverPortPair CreatePortPair()
 	    {
-            if (UacHelper.IsUacEnabled && !UacHelper.IsProcessElevated
+            if ((UacHelper.IsUacEnabled && !UacHelper.IsProcessElevated)
                 || !UacHelper.IsAdministrator())
                 throw new ApplicationException("This process must be run as an administrator.");
 
@@ -78,7 +82,7 @@ namespace Com0Com.CSharp
 
 	    public CrossoverPortPair CreatePortPair(string comPortNameA, string comPortNameB)
 		{
-			if (UacHelper.IsUacEnabled && !UacHelper.IsProcessElevated
+			if ((UacHelper.IsUacEnabled && !UacHelper.IsProcessElevated)
 			    || !UacHelper.IsAdministrator())
 				throw new ApplicationException("This process must be run as an administrator.");
 
