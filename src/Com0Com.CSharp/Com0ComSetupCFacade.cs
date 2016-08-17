@@ -39,7 +39,7 @@ namespace Com0Com.CSharp
         /// <returns>All com0com null-modem connections installed on the system</returns>
         public IEnumerable<CrossoverPortPair> GetCrossoverPortPairs()
 		{
-            if (!IsElevatedOrAdmin())
+            if (IsNotElevatedOrAdmin())
                 throw new ApplicationException("This process must be run as an administrator.");
 
 		    var stdOutLines = _cmdRunner.RunCommandGetStdOut(
@@ -56,7 +56,7 @@ namespace Com0Com.CSharp
 	    /// <returns>All com0com null-modem connections installed on the system</returns>
 	    public async Task<IEnumerable<CrossoverPortPair>> GetCrossoverPortPairsAsync()
 	    {
-            if (!IsElevatedOrAdmin())
+            if (IsNotElevatedOrAdmin())
                 throw new ApplicationException("This process must be run as an administrator.");
 
 	        var stdOutLines = await _cmdRunner.RunCommandGetStdOutAsync(
@@ -73,7 +73,7 @@ namespace Com0Com.CSharp
         /// <returns>The created virtual port pair</returns>
         public CrossoverPortPair CreatePortPair()
 	    {
-            if (!IsElevatedOrAdmin())
+            if (IsNotElevatedOrAdmin())
                 throw new ApplicationException("This process must be run as an administrator.");
 
             var stdOutLines = _cmdRunner.RunCommandGetStdOut(
@@ -90,7 +90,7 @@ namespace Com0Com.CSharp
 	    /// <returns>The created virtual port pair</returns>
 	    public async Task<CrossoverPortPair> CreatePortPairAsync()
 	    {
-            if (!IsElevatedOrAdmin())
+            if (IsNotElevatedOrAdmin())
                 throw new ApplicationException("This process must be run as an administrator.");
 
             var stdOutLines = await _cmdRunner.RunCommandGetStdOutAsync(
@@ -109,7 +109,7 @@ namespace Com0Com.CSharp
         /// <returns>The created virtual port pair</returns>
         public CrossoverPortPair CreatePortPair(string comPortNameA, string comPortNameB)
 		{
-			if (!IsElevatedOrAdmin())
+			if (IsNotElevatedOrAdmin())
 				throw new ApplicationException("This process must be run as an administrator.");
 
             var stdOutLines = _cmdRunner.RunCommandGetStdOut(
@@ -128,7 +128,7 @@ namespace Com0Com.CSharp
 	    /// <returns>The created virtual port pair</returns>
 	    public async Task<CrossoverPortPair> CreatePortPairAsync(string comPortNameA, string comPortNameB)
 	    {
-            if (!IsElevatedOrAdmin())
+            if (IsNotElevatedOrAdmin())
                 throw new ApplicationException("This process must be run as an administrator.");
 
             var stdOutLines = await _cmdRunner.RunCommandGetStdOutAsync(
@@ -145,7 +145,7 @@ namespace Com0Com.CSharp
         /// <param name="n"></param>
 		public void DeletePortPair(int n)
 		{
-			if (!IsElevatedOrAdmin())
+			if (IsNotElevatedOrAdmin())
 				throw new ApplicationException("This process must be run as an administrator.");
 
             _cmdRunner.RunCommandGetStdOut(
@@ -160,7 +160,7 @@ namespace Com0Com.CSharp
 	    /// <param name="n"></param>
 	    public async Task DeletePortPairAsync(int n)
 	    {
-            if (!IsElevatedOrAdmin())
+            if (IsNotElevatedOrAdmin())
                 throw new ApplicationException("This process must be run as an administrator.");
 
             await _cmdRunner.RunCommandGetStdOutAsync(
@@ -170,7 +170,7 @@ namespace Com0Com.CSharp
         }
 
 
-        private bool IsElevatedOrAdmin()
+        private bool IsNotElevatedOrAdmin()
 	    {
             return (UacHelper.IsUacEnabled && !UacHelper.IsProcessElevated) || !UacHelper.IsAdministrator();
         }
