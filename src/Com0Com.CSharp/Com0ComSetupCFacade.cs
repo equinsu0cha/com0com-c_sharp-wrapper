@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Com0Com.CSharp
 {
@@ -49,6 +50,23 @@ namespace Com0Com.CSharp
 			return ParsePortPairsFromStdOut(stdOutLines.Select(l => l.Trim()));
 		}
 
+	    /// <summary>
+	    /// Get all com0com null-modem connections installed on the system
+	    /// </summary>
+	    /// <returns>All com0com null-modem connections installed on the system</returns>
+	    public async Task<IEnumerable<CrossoverPortPair>> GetCrossoverPortPairsAsync()
+	    {
+            if (!IsElevatedOrAdmin())
+                throw new ApplicationException("This process must be run as an administrator.");
+
+	        var stdOutLines = await _cmdRunner.RunCommandGetStdOutAsync(
+	            Path.GetDirectoryName(_com0ComSetupC),
+	            _com0ComSetupC,
+	            "list");
+
+            return ParsePortPairsFromStdOut(stdOutLines.Select(l => l.Trim()));
+        }
+
         /// <summary>
         /// Create a com0com null-modem connection between virtual com ports with default names
         /// </summary>
@@ -67,12 +85,29 @@ namespace Com0Com.CSharp
         }
 
 	    /// <summary>
-	    /// Create a com0com null-modem connection between virtual com ports with specified names
+	    /// Create a com0com null-modem connection between virtual com ports with default names
 	    /// </summary>
-	    /// <param name="comPortNameA">The name of virtual com port A</param>
-	    /// <param name="comPortNameB">The name of virtual com port B</param>
 	    /// <returns>The created virtual port pair</returns>
-	    public CrossoverPortPair CreatePortPair(string comPortNameA, string comPortNameB)
+	    public async Task<CrossoverPortPair> CreatePortPairAsync()
+	    {
+            if (!IsElevatedOrAdmin())
+                throw new ApplicationException("This process must be run as an administrator.");
+
+            var stdOutLines = await _cmdRunner.RunCommandGetStdOutAsync(
+                Path.GetDirectoryName(_com0ComSetupC),
+                _com0ComSetupC,
+                "install - -");
+
+            return ParsePortPairsFromStdOut(stdOutLines.Select(l => l.Trim())).First();
+        }
+
+        /// <summary>
+        /// Create a com0com null-modem connection between virtual com ports with specified names
+        /// </summary>
+        /// <param name="comPortNameA">The name of virtual com port A</param>
+        /// <param name="comPortNameB">The name of virtual com port B</param>
+        /// <returns>The created virtual port pair</returns>
+        public CrossoverPortPair CreatePortPair(string comPortNameA, string comPortNameB)
 		{
 			if (!IsElevatedOrAdmin())
 				throw new ApplicationException("This process must be run as an administrator.");
@@ -84,6 +119,25 @@ namespace Com0Com.CSharp
 
 			return ParsePortPairsFromStdOut(stdOutLines.Select(l => l.Trim())).First();
 		}
+
+	    /// <summary>
+	    /// Create a com0com null-modem connection between virtual com ports with specified names
+	    /// </summary>
+	    /// <param name="comPortNameA">The name of virtual com port A</param>
+	    /// <param name="comPortNameB">The name of virtual com port B</param>
+	    /// <returns>The created virtual port pair</returns>
+	    public async Task<CrossoverPortPair> CreatePortPairAsync(string comPortNameA, string comPortNameB)
+	    {
+            if (!IsElevatedOrAdmin())
+                throw new ApplicationException("This process must be run as an administrator.");
+
+            var stdOutLines = await _cmdRunner.RunCommandGetStdOutAsync(
+                Path.GetDirectoryName(_com0ComSetupC),
+                _com0ComSetupC,
+                $"install portname={comPortNameA} portname={comPortNameB}");
+
+            return ParsePortPairsFromStdOut(stdOutLines.Select(l => l.Trim())).First();
+        }
 
         /// <summary>
         /// Remove a com0com null-modem connection and the two virtual com ports associated with the connection
@@ -100,7 +154,23 @@ namespace Com0Com.CSharp
                 $"remove {n}");
 		}
 
-	    private bool IsElevatedOrAdmin()
+	    /// <summary>
+	    /// Remove a com0com null-modem connection and the two virtual com ports associated with the connection
+	    /// </summary>
+	    /// <param name="n"></param>
+	    public async Task DeletePortPairAsync(int n)
+	    {
+            if (!IsElevatedOrAdmin())
+                throw new ApplicationException("This process must be run as an administrator.");
+
+            await _cmdRunner.RunCommandGetStdOutAsync(
+                Path.GetDirectoryName(_com0ComSetupC),
+                _com0ComSetupC,
+                $"remove {n}");
+        }
+
+
+        private bool IsElevatedOrAdmin()
 	    {
             return (UacHelper.IsUacEnabled && !UacHelper.IsProcessElevated) || !UacHelper.IsAdministrator();
         }
