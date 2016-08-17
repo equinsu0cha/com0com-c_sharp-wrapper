@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -9,133 +8,102 @@ namespace Com0Com.CSharp
 {
 	public class Com0ComSetupCFacade
 	{
-		private readonly string _com0comSetupC;
+	    private readonly ICmdRunner _cmdRunner;
+	    private readonly string _com0ComSetupC;
 
-		public Com0ComSetupCFacade(string com0comSetupC = @"C:\Program Files (x86)\com0com\setupc.exe")
-		{
-			_com0comSetupC = com0comSetupC;
-		}
-
-		/// <summary>
-		/// Get all com0com Port Pairs currently installed in the system.
-		/// </summary>
-		/// <returns></returns>
-		public IEnumerable<CrossoverPortPair> GetCrossoverPortPairs()
-		{
-            if ((UacHelper.IsUacEnabled && !UacHelper.IsProcessElevated)
-                || !UacHelper.IsAdministrator())
-                throw new ApplicationException("This process must be run as an administrator.");
-
-            var proc = new Process
-			{
-				StartInfo = new ProcessStartInfo
-				{
-                    WorkingDirectory = Path.GetDirectoryName(_com0comSetupC),
-                    FileName = _com0comSetupC,
-					Arguments = "list",
-					UseShellExecute = false,
-					RedirectStandardOutput = true,
-					CreateNoWindow = true
-				}
-			};
-
-			proc.Start();
-
-			var lines = new List<string>();
-			while (!proc.StandardOutput.EndOfStream)
-			{
-				lines.Add(proc.StandardOutput.ReadLine());
-			}
-
-			return ParsePortPairsFromStdOut(lines.Select(l => l.Trim()));
-		}
-
-	    public CrossoverPortPair CreatePortPair()
-	    {
-            if ((UacHelper.IsUacEnabled && !UacHelper.IsProcessElevated)
-                || !UacHelper.IsAdministrator())
-                throw new ApplicationException("This process must be run as an administrator.");
-
-            var proc = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    WorkingDirectory = Path.GetDirectoryName(_com0comSetupC),
-                    FileName = _com0comSetupC,
-                    Arguments = $"install - -",
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    CreateNoWindow = true,
-                    Verb = "runas"
-                }
-            };
-            proc.Start();
-
-            var lines = new List<string>();
-            while (!proc.StandardOutput.EndOfStream)
-            {
-                lines.Add(proc.StandardOutput.ReadLine());
-            }
-
-            return ParsePortPairsFromStdOut(lines.Select(l => l.Trim())).First();
+        /// <summary>
+        /// Create a setupc.exe facade using the default implementation of ICmdRunner
+        /// </summary>
+        /// <param name="com0ComSetupC"></param>
+        public Com0ComSetupCFacade(string com0ComSetupC = @"C:\Program Files (x86)\com0com\setupc.exe")
+        {
+            _cmdRunner = new CmdRunner();
+            _com0ComSetupC = com0ComSetupC;
         }
 
+        /// <summary>
+        /// Create a setupc.exe facade with your own implementation of ICmdRunner
+        /// </summary>
+        /// <param name="cmdRunner"></param>
+        /// <param name="com0ComSetupC"></param>
+		public Com0ComSetupCFacade(ICmdRunner cmdRunner, string com0ComSetupC = @"C:\Program Files (x86)\com0com\setupc.exe")
+		{
+		    _cmdRunner = cmdRunner;
+			_com0ComSetupC = com0ComSetupC;
+		}
+
+        /// <summary>
+        /// Get all com0com null-modem connections installed on the system
+        /// </summary>
+        /// <returns>All com0com null-modem connections installed on the system</returns>
+        public IEnumerable<CrossoverPortPair> GetCrossoverPortPairs()
+		{
+            if (!IsElevatedOrAdmin())
+                throw new ApplicationException("This process must be run as an administrator.");
+
+		    var stdOutLines = _cmdRunner.RunCommandGetStdOut(
+                Path.GetDirectoryName(_com0ComSetupC), 
+                _com0ComSetupC, 
+                "list");
+            
+			return ParsePortPairsFromStdOut(stdOutLines.Select(l => l.Trim()));
+		}
+
+        /// <summary>
+        /// Create a com0com null-modem connection between virtual com ports with default names
+        /// </summary>
+        /// <returns>The created virtual port pair</returns>
+        public CrossoverPortPair CreatePortPair()
+	    {
+            if (!IsElevatedOrAdmin())
+                throw new ApplicationException("This process must be run as an administrator.");
+
+            var stdOutLines = _cmdRunner.RunCommandGetStdOut(
+                Path.GetDirectoryName(_com0ComSetupC), 
+                _com0ComSetupC, 
+                "install - -");
+
+            return ParsePortPairsFromStdOut(stdOutLines.Select(l => l.Trim())).First();
+        }
+
+	    /// <summary>
+	    /// Create a com0com null-modem connection between virtual com ports with specified names
+	    /// </summary>
+	    /// <param name="comPortNameA">The name of virtual com port A</param>
+	    /// <param name="comPortNameB">The name of virtual com port B</param>
+	    /// <returns>The created virtual port pair</returns>
 	    public CrossoverPortPair CreatePortPair(string comPortNameA, string comPortNameB)
 		{
-			if ((UacHelper.IsUacEnabled && !UacHelper.IsProcessElevated)
-			    || !UacHelper.IsAdministrator())
+			if (!IsElevatedOrAdmin())
 				throw new ApplicationException("This process must be run as an administrator.");
 
-			var proc = new Process
-			{
-				StartInfo = new ProcessStartInfo
-				{
-					WorkingDirectory = Path.GetDirectoryName(_com0comSetupC),
-					FileName = _com0comSetupC,
-					Arguments = $"install portname={comPortNameA} portname={comPortNameB}",
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    CreateNoWindow = true,
-                    Verb = "runas"
-				}
-			};
-			proc.Start();
+            var stdOutLines = _cmdRunner.RunCommandGetStdOut(
+                Path.GetDirectoryName(_com0ComSetupC),
+                _com0ComSetupC,
+                $"install portname={comPortNameA} portname={comPortNameB}");
 
-			var lines = new List<string>();
-			while (!proc.StandardOutput.EndOfStream)
-			{
-				lines.Add(proc.StandardOutput.ReadLine());
-			}
-
-			return ParsePortPairsFromStdOut(lines.Select(l => l.Trim())).First();
+			return ParsePortPairsFromStdOut(stdOutLines.Select(l => l.Trim())).First();
 		}
 
+        /// <summary>
+        /// Remove a com0com null-modem connection and the two virtual com ports associated with the connection
+        /// </summary>
+        /// <param name="n"></param>
 		public void DeletePortPair(int n)
 		{
-			if (UacHelper.IsUacEnabled && !UacHelper.IsProcessElevated
-				|| !UacHelper.IsAdministrator())
+			if (!IsElevatedOrAdmin())
 				throw new ApplicationException("This process must be run as an administrator.");
 
-			var proc = new Process
-			{
-				StartInfo = new ProcessStartInfo
-				{
-					WorkingDirectory = Path.GetDirectoryName(_com0comSetupC),
-					FileName = _com0comSetupC,
-					Arguments = $"remove {n}",
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    CreateNoWindow = true,
-                    Verb = "runas"
-				}
-			};
-			proc.Start();
-
-			while (!proc.HasExited) { }
-
-			if (proc.ExitCode != 0)
-				throw new ApplicationException($"Could not delete port pair number {n}");
+            _cmdRunner.RunCommandGetStdOut(
+                Path.GetDirectoryName(_com0ComSetupC),
+                _com0ComSetupC,
+                $"remove {n}");
 		}
+
+	    private bool IsElevatedOrAdmin()
+	    {
+            return (UacHelper.IsUacEnabled && !UacHelper.IsProcessElevated) || !UacHelper.IsAdministrator();
+        }
 
 		private IEnumerable<CrossoverPortPair> ParsePortPairsFromStdOut(IEnumerable<string> lines)
 		{
