@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Com0Com.CSharp
 {
@@ -16,15 +15,6 @@ namespace Com0Com.CSharp
         /// <param name="args">The args to supply to the command</param>
         /// <returns>Lines of the Standard Out</returns>
         string[] RunCommandGetStdOut(string workingDir, string command, string args);
-
-        /// <summary>
-        /// Run a command on the cmd line asynchronously and get the standard out
-        /// </summary>
-        /// <param name="workingDir">The working directory to run the command in</param>
-        /// <param name="command">The command to run</param>
-        /// <param name="args">The args to supply to the command</param>
-        /// <returns>Lines of the Standard Out</returns>
-        Task<string[]> RunCommandGetStdOutAsync(string workingDir, string command, string args);
     }
 
     public class CmdRunner : ICmdRunner
@@ -68,18 +58,6 @@ namespace Com0Com.CSharp
             }
             
             return ret.ToArray();
-        }
-
-        /// <summary>
-        /// Run a command on the cmd line asynchronously and get the standard out with no shell execute and no window
-        /// </summary>
-        /// <param name="workingDir">The working directory to run the command in</param>
-        /// <param name="command">The command to run</param>
-        /// <param name="args">The args to supply to the command</param>
-        /// <returns>Lines of the Standard Out</returns>
-        public async Task<string[]> RunCommandGetStdOutAsync(string workingDir, string command, string args)
-        {
-            return await Task.Run(() => RunCommandGetStdOut(workingDir, command, args));
         }
     }
 }

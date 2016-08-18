@@ -9,6 +9,10 @@ namespace Com0Com.CSharp.Examples
 
         static void Main(string[] args)
         {
+            SyncExample();
+
+            Console.WriteLine();
+
             Task.Run(AsyncExample).Wait();
         }
 
