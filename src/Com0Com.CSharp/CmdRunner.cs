@@ -23,9 +23,8 @@ namespace Com0Com.CSharp
         /// <param name="workingDir">The working directory to run the command in</param>
         /// <param name="command">The command to run</param>
         /// <param name="args">The args to supply to the command</param>
-        /// <param name="ct">CancellationToken to cancel the async operation</param>
         /// <returns>Lines of the Standard Out</returns>
-        Task<string[]> RunCommandGetStdOutAsync(string workingDir, string command, string args, CancellationToken ct);
+        Task<string[]> RunCommandGetStdOutAsync(string workingDir, string command, string args);
     }
 
     public class CmdRunner : ICmdRunner
@@ -58,7 +57,7 @@ namespace Com0Com.CSharp
             {
                 Thread.Sleep(100);
             }
-
+            
             if (proc.ExitCode != 0)
                 throw new ApplicationException($"Exit code of {proc.ExitCode} received when running '{command} {args}'");
 
@@ -67,7 +66,7 @@ namespace Com0Com.CSharp
             {
                 ret.Add(proc.StandardOutput.ReadLine());
             }
-
+            
             return ret.ToArray();
         }
 
@@ -77,11 +76,10 @@ namespace Com0Com.CSharp
         /// <param name="workingDir">The working directory to run the command in</param>
         /// <param name="command">The command to run</param>
         /// <param name="args">The args to supply to the command</param>
-        /// <param name="ct">CancellationToken to cancel the async operation</param>
         /// <returns>Lines of the Standard Out</returns>
-        public async Task<string[]> RunCommandGetStdOutAsync(string workingDir, string command, string args, CancellationToken ct)
+        public async Task<string[]> RunCommandGetStdOutAsync(string workingDir, string command, string args)
         {
-            return await Task.Run(() => RunCommandGetStdOut(workingDir, command, args), ct);
+            return await Task.Run(() => RunCommandGetStdOut(workingDir, command, args));
         }
     }
 }

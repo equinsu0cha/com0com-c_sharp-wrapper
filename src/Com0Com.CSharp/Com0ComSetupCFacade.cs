@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Com0Com.CSharp
@@ -56,7 +55,7 @@ namespace Com0Com.CSharp
         /// </summary>
         /// <param name="ct">CancellationToken to cancel the async operation</param>
         /// <returns>All com0com null-modem connections installed on the system</returns>
-        public async Task<IEnumerable<CrossoverPortPair>> GetCrossoverPortPairsAsync(CancellationToken ct)
+        public async Task<IEnumerable<CrossoverPortPair>> GetCrossoverPortPairsAsync()
 	    {
             if (IsNotElevatedOrAdmin())
                 throw new ApplicationException("This process must be run as an administrator.");
@@ -64,11 +63,10 @@ namespace Com0Com.CSharp
 	        var stdOutLines = await _cmdRunner.RunCommandGetStdOutAsync(
 	            Path.GetDirectoryName(_com0ComSetupC),
 	            _com0ComSetupC,
-	            "list",
-                ct);
+	            "list");
 
             return ParsePortPairsFromStdOut(stdOutLines.Select(l => l.Trim()));
-        }
+	    }
 
         /// <summary>
         /// Create a com0com null-modem connection between virtual com ports with default names
@@ -84,15 +82,16 @@ namespace Com0Com.CSharp
                 _com0ComSetupC, 
                 "install - -");
 
-            return ParsePortPairsFromStdOut(stdOutLines.Select(l => l.Trim())).First();
-        }
+            var ret = ParsePortPairsFromStdOut(stdOutLines.Select(l => l.Trim())).First();
+
+            return ret;
+	    }
 
         /// <summary>
         /// Create a com0com null-modem connection between virtual com ports with default names
         /// </summary>
-        /// <param name="ct">CancellationToken to cancel the async operation</param>
         /// <returns>The created virtual port pair</returns>
-        public async Task<CrossoverPortPair> CreatePortPairAsync(CancellationToken ct)
+        public async Task<CrossoverPortPair> CreatePortPairAsync()
 	    {
             if (IsNotElevatedOrAdmin())
                 throw new ApplicationException("This process must be run as an administrator.");
@@ -100,11 +99,12 @@ namespace Com0Com.CSharp
             var stdOutLines = await _cmdRunner.RunCommandGetStdOutAsync(
                 Path.GetDirectoryName(_com0ComSetupC),
                 _com0ComSetupC,
-                "install - -",
-                ct);
+                "install - -");
 
-            return ParsePortPairsFromStdOut(stdOutLines.Select(l => l.Trim())).First();
-        }
+            var ret = ParsePortPairsFromStdOut(stdOutLines.Select(l => l.Trim())).First();
+            
+            return ret;
+	    }
 
         /// <summary>
         /// Create a com0com null-modem connection between virtual com ports with specified names
@@ -132,7 +132,7 @@ namespace Com0Com.CSharp
         /// <param name="comPortNameB">The name of virtual com port B</param>
         /// <param name="ct">CancellationToken to cancel the async operation</param>
         /// <returns>The created virtual port pair</returns>
-        public async Task<CrossoverPortPair> CreatePortPairAsync(string comPortNameA, string comPortNameB, CancellationToken ct)
+        public async Task<CrossoverPortPair> CreatePortPairAsync(string comPortNameA, string comPortNameB)
 	    {
             if (IsNotElevatedOrAdmin())
                 throw new ApplicationException("This process must be run as an administrator.");
@@ -140,8 +140,7 @@ namespace Com0Com.CSharp
             var stdOutLines = await _cmdRunner.RunCommandGetStdOutAsync(
                 Path.GetDirectoryName(_com0ComSetupC),
                 _com0ComSetupC,
-                $"install portname={comPortNameA} portname={comPortNameB}",
-                ct);
+                $"install portname={comPortNameA} portname={comPortNameB}");
 
             return ParsePortPairsFromStdOut(stdOutLines.Select(l => l.Trim())).First();
         }
@@ -166,7 +165,7 @@ namespace Com0Com.CSharp
         /// </summary>
         /// <param name="n"></param>
         /// <param name="ct">CancellationToken to cancel the async operation</param>
-        public async Task DeletePortPairAsync(int n, CancellationToken ct)
+        public async Task DeletePortPairAsync(int n)
 	    {
             if (IsNotElevatedOrAdmin())
                 throw new ApplicationException("This process must be run as an administrator.");
@@ -174,8 +173,7 @@ namespace Com0Com.CSharp
             await _cmdRunner.RunCommandGetStdOutAsync(
                 Path.GetDirectoryName(_com0ComSetupC),
                 _com0ComSetupC,
-                $"remove {n}",
-                ct);
+                $"remove {n}");
         }
 
 
