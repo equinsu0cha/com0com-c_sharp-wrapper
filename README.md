@@ -1,5 +1,5 @@
-##Com0Com.CSharp
-###Description
+## Com0Com.CSharp
+### Description
 This is a C# wrapper for the com0com null-modem emulator.
 
 At this time, the following features are implemented:
@@ -10,9 +10,9 @@ At this time, the following features are implemented:
 This assembly is available on nuget.
 https://www.nuget.org/packages/Com0Com.CSharp/
 
-###Usage
+### Usage
 To use this assembly, you must install com0com which can be found here:
 http://com0com.sourceforge.net
 
-###Examples
+### Examples
 Please see the example project
